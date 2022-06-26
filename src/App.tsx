@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import Banner from "./Banner";
+import Home from "./Home";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -10,6 +11,7 @@ const Wrapper = styled.div`
 function App() {
   return (
     <Wrapper>
+      <Home />
       <Banner
         text={
           "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque quia aliquam, eos ratione aperiam eius eum laborum enim, ullam iste aut. Excepturi sed exercitationem culpa ab, modi deserunt cum. Nisi."
