@@ -13,4 +13,14 @@ type Store = {
 };
 ```
 
+- 인터섹션 있음.
+- 중복을 또 씀.
+
+```
+type NewsComment = News & {
+  comments: NewsComment[];
+  level: number;
+};
+```
+
 - 타입 인터페이스

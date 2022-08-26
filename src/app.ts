@@ -8,15 +8,28 @@ type Store = {
   feeds: NewsFeed[];
 };
 
-type NewsFeed = {
+type News = {
   id: number;
-  comments_count: number;
+  time_ago: string;
+  title: string;
   url: string;
   user: string;
-  time_ago: string;
+  content: string;
+};
+
+type NewsFeed = News & {
+  comments_count: number;
   points: number;
-  title: string;
   read?: boolean;
+};
+
+type NewsDetail = News & {
+  comments: NewsComment[];
+};
+
+type NewsComment = News & {
+  comments: NewsComment[];
+  level: number;
 };
 
 const store: Store = {
@@ -24,7 +37,7 @@ const store: Store = {
   feeds: [],
 };
 
-function getData(url) {
+function getData(url: string) {
   ajax.open("GET", url, false);
   ajax.send();
 
@@ -39,6 +52,7 @@ function makeFeeds(feeds) {
   return feeds;
 }
 
+//type 가드
 function updateView(html) {
   if (container) {
     container.innerHTML = html;

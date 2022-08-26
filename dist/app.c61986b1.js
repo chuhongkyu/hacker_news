@@ -141,7 +141,8 @@ function makeFeeds(feeds) {
   }
 
   return feeds;
-}
+} //type 가드
+
 
 function updateView(html) {
   if (container) {
