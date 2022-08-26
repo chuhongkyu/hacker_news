@@ -1,14 +1,31 @@
-const container = document.getElementById('root');
-const ajax = new XMLHttpRequest();
-const NEWS_URL = 'https://api.hnpwa.com/v0/news/1.json';
-const CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json';
-const store = {
+const container: HTMLElement | null = document.getElementById("root");
+const ajax: XMLHttpRequest = new XMLHttpRequest();
+const NEWS_URL = "https://api.hnpwa.com/v0/news/1.json";
+const CONTENT_URL = "https://api.hnpwa.com/v0/item/@id.json";
+
+type Store = {
+  currentPage: number;
+  feeds: NewsFeed[];
+};
+
+type NewsFeed = {
+  id: number;
+  comments_count: number;
+  url: string;
+  user: string;
+  time_ago: string;
+  points: number;
+  title: string;
+  read?: boolean;
+};
+
+const store: Store = {
   currentPage: 1,
   feeds: [],
 };
 
 function getData(url) {
-  ajax.open('GET', url, false);
+  ajax.open("GET", url, false);
   ajax.send();
 
   return JSON.parse(ajax.response);
@@ -22,8 +39,16 @@ function makeFeeds(feeds) {
   return feeds;
 }
 
+function updateView(html) {
+  if (container) {
+    container.innerHTML = html;
+  } else {
+    console.error("container 가 없습니다.");
+  }
+}
+
 function newsFeed() {
-  let newsFeed = store.feeds;
+  let newsFeed: NewsFeed[] = store.feeds;
   const newsList = [];
   let template = `
     <div class="bg-gray-600 min-h-screen">
@@ -54,15 +79,19 @@ function newsFeed() {
     newsFeed = store.feeds = makeFeeds(getData(NEWS_URL));
   }
 
-  for(let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
+  for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
     newsList.push(`
-      <div class="p-6 ${newsFeed[i].read ? 'bg-red-500' : 'bg-white'} mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
+      <div class="p-6 ${
+        newsFeed[i].read ? "bg-red-500" : "bg-white"
+      } mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
         <div class="flex">
           <div class="flex-auto">
             <a href="#/show/${newsFeed[i].id}">${newsFeed[i].title}</a>  
           </div>
           <div class="text-center text-sm">
-            <div class="w-10 text-white bg-green-300 rounded-lg px-0 py-2">${newsFeed[i].comments_count}</div>
+            <div class="w-10 text-white bg-green-300 rounded-lg px-0 py-2">${
+              newsFeed[i].comments_count
+            }</div>
           </div>
         </div>
         <div class="flex mt-3">
@@ -76,16 +105,18 @@ function newsFeed() {
     `);
   }
 
-  template = template.replace('{{__news_feed__}}', newsList.join(''));
-  template = template.replace('{{__prev_page__}}', store.currentPage > 1 ? store.currentPage - 1 : 1);
-  template = template.replace('{{__next_page__}}', store.currentPage + 1);
-  
-  container.innerHTML = template;
+  template = template.replace("{{__news_feed__}}", newsList.join(""));
+  template = template.replace(
+    "{{__prev_page__}}",
+    store.currentPage > 1 ? store.currentPage - 1 : 1
+  );
+  template = template.replace("{{__next_page__}}", store.currentPage + 1);
+  updateView(template);
 }
 
 function newsDetail() {
   const id = location.hash.substr(7);
-  const newsContent = getData(CONTENT_URL.replace('@id', id))
+  const newsContent = getData(CONTENT_URL.replace("@id", id));
   let template = `
     <div class="bg-gray-600 min-h-screen pb-8">
       <div class="bg-white text-xl">
@@ -115,7 +146,7 @@ function newsDetail() {
     </div>
   `;
 
-  for(let i=0; i < store.feeds.length; i++) {
+  for (let i = 0; i < store.feeds.length; i++) {
     if (store.feeds[i].id === Number(id)) {
       store.feeds[i].read = true;
       break;
@@ -125,7 +156,7 @@ function newsDetail() {
   function makeComment(comments, called = 0) {
     const commentString = [];
 
-    for(let i = 0; i < comments.length; i++) {
+    for (let i = 0; i < comments.length; i++) {
       commentString.push(`
         <div style="padding-left: ${called * 40}px;" class="mt-4">
           <div class="text-gray-400">
@@ -141,25 +172,26 @@ function newsDetail() {
       }
     }
 
-    return commentString.join('');
+    return commentString.join("");
   }
-
-  container.innerHTML = template.replace('{{__comments__}}', makeComment(newsContent.comments));
+  updateView(
+    template.replace("{{__comments__}}", makeComment(newsContent.comments))
+  );
 }
 
 function router() {
   const routePath = location.hash;
 
-  if (routePath === '') {
+  if (routePath === "") {
     newsFeed();
-  } else if (routePath.indexOf('#/page/') >= 0) {
+  } else if (routePath.indexOf("#/page/") >= 0) {
     store.currentPage = Number(routePath.substr(7));
     newsFeed();
   } else {
-    newsDetail()
+    newsDetail();
   }
 }
 
-window.addEventListener('hashchange', router);
+window.addEventListener("hashchange", router);
 
 router();
