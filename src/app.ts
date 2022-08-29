@@ -3,34 +3,39 @@ const ajax: XMLHttpRequest = new XMLHttpRequest();
 const NEWS_URL = "https://api.hnpwa.com/v0/news/1.json";
 const CONTENT_URL = "https://api.hnpwa.com/v0/item/@id.json";
 
-type Store = {
+// type Store = {
+//   currentPage: number;
+//   feeds: NewsFeed[];
+// };
+
+interface Store {
   currentPage: number;
   feeds: NewsFeed[];
-};
+}
 
-type News = {
-  id: number;
-  time_ago: string;
-  title: string;
-  url: string;
+interface News {
+  readonly id: number;
+  readonly time_ago: string;
+  readonly title: string;
+  readonly url: string;
   user: string;
   content: string;
-};
+}
 
-type NewsFeed = News & {
+interface NewsFeed extends News {
   comments_count: number;
   points: number;
   read?: boolean;
-};
+}
 
-type NewsDetail = News & {
+interface NewsDetail extends News {
   comments: NewsComment[];
-};
+}
 
-type NewsComment = News & {
+interface NewsComment extends News {
   comments: NewsComment[];
   level: number;
-};
+}
 
 const store: Store = {
   currentPage: 1,
